@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dofus Craft Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#f8f9fb; --surface:#ffffff; --surface2:#f1f3f7;
+  --border:#e2e6ee; --border2:#c9d0de;
+  --text:#1a1d27; --text2:#5a6278; --text3:#9098b0;
+  --gold:#b8860b; --gold-bg:#fdf7e3; --gold-border:#f0d060;
+  --green:#1a7a4a; --green-bg:#eaf7f0; --green-border:#a3dfc0;
+  --red:#c0392b; --red-bg:#fdf0ef; --red-border:#f5b8b3;
+  --orange:#c47d10; --orange-bg:#fef6e4; --orange-border:#f8d98a;
+  --blue:#1a5fa8; --blue-bg:#eaf2fd; --blue-border:#a8ccf5;
+  --radius:10px; --radius-sm:6px;
+  --shadow:0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px var(--border);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;font-size:14px;}
+.page{max-width:1400px;margin:0 auto;padding:2rem 1.5rem;}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
+.header-left{display:flex;align-items:center;gap:12px;}
+.logo{width:40px;height:40px;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.header-title{font-size:1.25rem;font-weight:700;color:var(--text);}
+.header-sub{font-size:0.8rem;color:var(--text3);margin-top:1px;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.25rem;}
+.stat-label{font-size:0.72rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.stat-val{font-size:1.6rem;font-weight:700;line-height:1;color:var(--text);}
+.stat-val.v{color:var(--green);}
+.stat-val.r{color:var(--red);}
+.stat-val.g{color:var(--gold);}
+.stat-sub{font-size:0.75rem;color:var(--text3);margin-top:4px;}
+.stat-icon{float:right;font-size:1.4rem;opacity:0.18;margin-top:-2px;}
+
+/* Charts */
+.grille-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+@media(max-width:700px){.grille-2{grid-template-columns:1fr;}}
+.carte-g{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:0.85rem 1rem;}
+.carte-titre{font-size:0.72rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text3);margin-bottom:0.6rem;}
+
+/* Toolbar */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin:1.5rem 0 0.75rem;flex-wrap:wrap;gap:0.5rem;}
+.section-title{font-size:0.85rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--text2);}
+.toolbar{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
+.btn{font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:500;padding:0.45rem 0.9rem;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;border-radius:var(--radius-sm);transition:all 0.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.btn:hover{background:var(--surface2);border-color:var(--border2);color:var(--text);}
+.btn.vert{border-color:var(--green-border);background:var(--green-bg);color:var(--green);}
+.btn.vert:hover{filter:brightness(0.96);}
+.btn.rouge{border-color:var(--red-border);background:var(--red-bg);color:var(--red);}
+.btn.rouge:hover{filter:brightness(0.96);}
+.champ{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.45rem 0.75rem;font-family:'Inter',sans-serif;font-size:0.85rem;border-radius:var(--radius-sm);outline:none;transition:border 0.15s;}
+.champ:focus{border-color:var(--blue);}
+.champ::placeholder{color:var(--text3);}
+
+/* Table */
+.table-wrap{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.table-inner{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+thead{border-bottom:2px solid var(--border);}
+thead th{font-size:0.7rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);padding:0.7rem 0.85rem;text-align:left;background:var(--surface2);white-space:nowrap;cursor:pointer;user-select:none;}
+thead th:hover{color:var(--text2);}
+thead th.sorted{color:var(--blue);}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface2);}
+td{padding:0;vertical-align:middle;}
+
+.cell-edit{display:block;width:100%;padding:0.55rem 0.85rem;background:transparent;border:none;color:var(--text);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;cursor:pointer;}
+.cell-edit:focus{background:var(--blue-bg);outline:2px solid var(--blue);outline-offset:-2px;cursor:text;border-radius:4px;}
+.cell-edit.kamas{font-size:0.82rem;text-align:right;font-weight:500;}
+.cell-edit.centre{text-align:center;}
+
+.cell-calc{display:block;padding:0.55rem 0.85rem;font-size:0.82rem;font-weight:600;text-align:right;}
+.cell-calc.v{color:var(--green);}
+.cell-calc.r{color:var(--red);}
+.cell-calc.o{color:var(--orange);}
+.cell-calc.muted{color:var(--text2);font-weight:500;}
+
+.sel-statut{background:transparent;border:none;color:inherit;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;width:100%;padding:0.5rem 0.6rem;outline:none;appearance:none;}
+.sel-statut:focus{background:var(--surface2);}
+option{background:var(--surface);color:var(--text);}
+
+/* Status badges */
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.72rem;font-weight:600;}
+.sb-v{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.sb-e{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border);}
+.sb-a{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dot-v{background:var(--green);}
+.dot-e{background:var(--orange);}
+.dot-a{background:var(--blue);}
+
+/* Rendement badge */
+.rend{display:inline-block;padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:600;}
+.rend-v{background:var(--green-bg);color:var(--green);}
+.rend-o{background:var(--orange-bg);color:var(--orange);}
+.rend-r{background:var(--red-bg);color:var(--red);}
+
+/* Barre bénéfice */
+.barre-w{height:3px;background:var(--surface2);border-radius:2px;margin-top:3px;width:60px;display:inline-block;vertical-align:middle;}
+.barre-f{height:100%;border-radius:2px;}
+
+/* Accent latéral couleur */
+.row-accent{width:4px;height:100%;border-radius:4px 0 0 4px;}
+
+/* Delete btn */
+.btn-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:0.55rem 0.6rem;width:100%;transition:color 0.15s;}
+.btn-del:hover{color:var(--red);}
+
+/* Flash */
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.flash-msg{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface);border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,0.12);color:var(--text);padding:0.75rem 1.25rem;font-size:0.82rem;border-radius:var(--radius);z-index:9999;animation:slideUp 0.25s ease;}
+
+/* Diff badge */
+.diff-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:0.7rem;font-weight:600;}
+.diff-F{background:#eaf7f0;color:#1a7a4a;}
+.diff-M{background:#fef6e4;color:#c47d10;}
+.diff-D{background:#fdf0ef;color:#c0392b;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">⚗</div>
+      <div>
+        <div class="header-title">Craft Dashboard</div>
+        <div class="header-sub">Dofus 3 · Draconiros — cliquez sur une cellule pour éditer</div>
+      </div>
+    </div>
+    <span class="badge">Dofus 3</span>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-grid" id="stats"></div>
+
+  <!-- Graphiques -->
+  <div class="grille-2">
+    <div class="carte-g">
+      <div class="carte-titre">Bénéfice net par item (top 10)</div>
+      <canvas id="chart-b" height="60"></canvas>
+    </div>
+    <div class="carte-g">
+      <div class="carte-titre">Répartition des statuts</div>
+      <canvas id="chart-s" height="60"></canvas>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="section-header">
+    <div class="section-title">📋 Suivi des crafts</div>
+    <div class="toolbar">
+      <button class="btn vert" onclick="ajouterLigne()">＋ Ajouter un item</button>
+      <button class="btn" onclick="sauvegarder()">💾 Sauvegarder</button>
+      <button class="btn" onclick="exporterJSON()">⬇ JSON</button>
+      <label class="btn" style="cursor:pointer;">⬆ Importer<input type="file" accept=".json" onchange="importerJSON(event)" style="display:none;"></label>
+      <input type="text" class="champ" id="recherche" placeholder="🔍 Rechercher un item…" oninput="rendreDashboard()" style="width:190px;">
+      <select class="champ" id="filtre-statut" onchange="rendreDashboard()">
+        <option value="">Tous statuts</option>
+        <option value="Vendu">✅ Vendu</option>
+        <option value="En cours">🟡 En cours</option>
+        <option value="À faire">🔵 À faire</option>
+      </select>
+      <button class="btn rouge" onclick="toutEffacer()">🗑 Effacer tout</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-inner">
+      <table id="tableau">
+        <thead>
+          <tr>
+            <th style="width:6px;padding:0;"></th>
+            <th onclick="trier('nom')">Nom de l'item</th>
+            <th onclick="trier('lot')" style="text-align:right;">Prix du lot</th>
+            <th onclick="trier('fm')" style="text-align:right;">Prix FM</th>
+            <th onclick="trier('qte')" style="text-align:center;">Qté</th>
+            <th onclick="trier('vente')" style="text-align:right;">Vente / u</th>
+            <th onclick="trier('diff')">Difficulté</th>
+            <th onclick="trier('statut')">Statut</th>
+            <th onclick="trier('invest')" style="text-align:right;">Investi</th>
+            <th onclick="trier('benefice')" style="text-align:right;">Bénéfice net</th>
+            <th onclick="trier('rendement')" style="text-align:center;">Rendement</th>
+            <th style="width:36px;"></th>
+          </tr>
+        </thead>
+        <tbody id="corps"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CLE = 'dofus_craft_v2';
+let items = chargerDonnees();
+let colTri = 'benefice', dirTri = -1;
+let chartB = null, chartS = null;
+
+function chargerDonnees() {
+  try { const s = localStorage.getItem(CLE); return s ? JSON.parse(s) : exemples(); }
+  catch(e) { return exemples(); }
+}
+function exemples() {
+  return [
+    { id:1, nom:'Coiffe Padgref',  lot:5000000, fm:200000, qte:5, vente:1500000, diff:'Moyen',    statut:'Vendu' },
+    { id:2, nom:'Baguette torké',  lot:11000000,fm:500000, qte:2, vente:5800000, diff:'Difficile',statut:'En cours' },
+    { id:3, nom:'Épée du Bouftou', lot:2000000, fm:100000, qte:3, vente:500000,  diff:'Facile',   statut:'À faire' },
+  ];
+}
+function sauvegarder() { localStorage.setItem(CLE, JSON.stringify(items)); flash('💾 Sauvegardé !'); }
+function exporterJSON() {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(items,null,2)],{type:'application/json'}));
+  a.download = 'craft_dofus.json'; a.click();
+}
+function importerJSON(e) {
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{ try{ items=JSON.parse(ev.target.result); sauvegarder(); rendreDashboard(); flash('✅ Importé !'); } catch(err){ alert('Fichier invalide'); } };
+  r.readAsText(f);
+}
+function toutEffacer() {
+  if(confirm('Effacer tous les items ?')){ items=[]; sauvegarder(); rendreDashboard(); }
+}
+function calculer(item) {
+  const invest=(item.lot||0)+(item.fm||0);
+  const ppu=item.qte>0?invest/item.qte:0;
+  const taxe=(item.vente||0)*0.02;
+  const venteN=(item.vente||0)-taxe;
+  const benefItem=venteN-ppu;
+  const benefTot=benefItem*(item.qte||1);
+  const rend=invest>0?(invest+benefTot)/invest:0;
+  return{invest,ppu,venteN,benefTot,rend};
+}
+function rendreDashboard() { rendrStats(); rendreGraphiques(); rendrTableau(); }
+
+function rendrStats() {
+  const calc=items.map(i=>({...i,...calculer(i)}));
+  const totalI=calc.reduce((s,i)=>s+i.invest,0);
+  const totalB=calc.reduce((s,i)=>s+i.benefTot,0);
+  const rentab=calc.filter(i=>i.benefTot>0).length;
+  const vendus=items.filter(i=>i.statut==='Vendu').length;
+  const cours=items.filter(i=>i.statut==='En cours').length;
+  const meill=calc.slice().sort((a,b)=>b.benefTot-a.benefTot)[0];
+  const rendM=calc.length?calc.reduce((s,i)=>s+i.rend,0)/calc.length:0;
+  document.getElementById('stats').innerHTML=[
+    {l:'Items trackés',    v:items.length,           cls:'',  s:`${rentab} rentables`,    icon:'📦'},
+    {l:'Total investi',    v:fK(totalI),             cls:'g', s:'kamas misés',             icon:'💰'},
+    {l:'Bénéfice total',   v:fK(totalB),             cls:totalB>=0?'v':'r', s:'après taxe HDV (2%)', icon:'📈'},
+    {l:'Items vendus',     v:vendus,                 cls:'v', s:`${cours} en cours`,       icon:'✅'},
+    {l:'Rendement moyen',  v:rendM.toFixed(2)+'×',  cls:rendM>=1.1?'v':'', s:'multiplicateur',     icon:'⚡'},
+    {l:'Meilleur item',    v:meill?meill.nom.split(' ').slice(0,2).join(' '):'—', cls:'g', s:meill?fK(meill.benefTot):'—', icon:'🏆'},
+  ].map(s=>`<div class="stat-card">
+    <div class="stat-label">${s.l} <span class="stat-icon">${s.icon}</span></div>
+    <div class="stat-val ${s.cls}">${s.v}</div>
+    <div class="stat-sub">${s.s}</div>
+  </div>`).join('');
+}
+
+function rendreGraphiques() {
+  const calc=items.map(i=>({...i,...calculer(i)})).sort((a,b)=>b.benefTot-a.benefTot).slice(0,10);
+  const opts={responsive:true,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:'#9098b0',font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'}},
+            y:{ticks:{color:'#9098b0',callback:v=>fK(v),font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'}}}};
+  if(chartB) chartB.destroy();
+  chartB=new Chart(document.getElementById('chart-b'),{
+    type:'bar',
+    data:{labels:calc.map(d=>d.nom.length>14?d.nom.slice(0,14)+'…':d.nom),
+      datasets:[{label:'Bénéfice',data:calc.map(d=>d.benefTot),
+        backgroundColor:calc.map(d=>d.benefTot>=0?'rgba(26,122,74,0.8)':'rgba(192,57,43,0.8)'),
+        borderColor:calc.map(d=>d.benefTot>=0?'#1a7a4a':'#c0392b'),
+        borderWidth:1,borderRadius:4}]},
+    options:opts
+  });
+  const v=items.filter(i=>i.statut==='Vendu').length;
+  const c=items.filter(i=>i.statut==='En cours').length;
+  const f=items.filter(i=>i.statut==='À faire').length;
+  const a=items.length-v-c-f;
+  if(chartS) chartS.destroy();
+  chartS=new Chart(document.getElementById('chart-s'),{
+    type:'doughnut',
+    data:{labels:['Vendu','En cours','À faire','Autre'],
+      datasets:[{data:[v,c,f,a],
+        backgroundColor:['rgba(26,122,74,0.85)','rgba(196,125,16,0.85)','rgba(26,95,168,0.85)','rgba(144,152,176,0.5)'],
+        borderColor:['#1a7a4a','#c47d10','#1a5fa8','#9098b0'],borderWidth:2}]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#5a6278',font:{size:11},padding:14}}},cutout:'58%'}
+  });
+}
+
+function rendrTableau() {
+  const rech=document.getElementById('recherche').value.toLowerCase();
+  const filSt=document.getElementById('filtre-statut').value;
+  let data=items.map(i=>({...i,...calculer(i)}));
+  if(rech) data=data.filter(d=>d.nom.toLowerCase().includes(rech));
+  if(filSt) data=data.filter(d=>d.statut===filSt);
+  const map={nom:'nom',lot:'lot',fm:'fm',qte:'qte',vente:'vente',diff:'diff',statut:'statut',invest:'invest',benefice:'benefTot',rendement:'rend'};
+  data.sort((a,b)=>{const k=map[colTri]||colTri;const av=a[k]??'',bv=b[k]??'';return typeof av==='number'?(av-bv)*dirTri:String(av).localeCompare(String(bv))*dirTri;});
+  const maxB=Math.max(...data.map(d=>Math.abs(d.benefTot)),1);
+  document.getElementById('corps').innerHTML=data.map(d=>{
+    const pct=Math.min(Math.abs(d.benefTot)/maxB*100,100);
+    const cb=d.benefTot>=0?'#1a7a4a':'#c0392b';
+    const rc=d.rend>=1.1?'rend-v':d.rend>=1?'rend-o':'rend-r';
+    const sc=d.statut==='Vendu'?'sb-v':d.statut==='En cours'?'sb-e':'sb-a';
+    const dot=d.statut==='Vendu'?'dot-v':d.statut==='En cours'?'dot-e':'dot-a';
+    const dc=d.diff==='Facile'?'diff-F':d.diff==='Difficile'?'diff-D':'diff-M';
+    return `<tr id="tr-${d.id}">
+      <td style="padding:0;width:6px;"><div style="width:4px;height:100%;min-height:38px;background:${cb};border-radius:4px 0 0 4px;"></div></td>
+      <td><input class="cell-edit" value="${esc(d.nom)}" placeholder="Nom de l'item" onchange="maj(${d.id},'nom',this.value)" style="min-width:140px;"/></td>
+      <td><input class="cell-edit kamas" type="number" value="${d.lot||''}" placeholder="0" onchange="maj(${d.id},'lot',+this.value)" style="width:110px;"/></td>
+      <td><input class="cell-edit kamas" type="number" value="${d.fm||''}" placeholder="0" onchange="maj(${d.id},'fm',+this.value)" style="width:100px;"/></td>
+      <td><input class="cell-edit centre" type="number" value="${d.qte||1}" min="1" onchange="maj(${d.id},'qte',+this.value)" style="width:60px;"/></td>
+      <td><input class="cell-edit kamas" type="number" value="${d.vente||''}" placeholder="0" onchange="maj(${d.id},'vente',+this.value)" style="width:110px;"/></td>
+      <td style="padding:0.5rem 0.85rem;">
+        <select class="sel-statut" onchange="maj(${d.id},'diff',this.value)" style="width:auto;">
+          ${['Facile','Moyen','Difficile'].map(o=>`<option${d.diff===o?' selected':''}>${o}</option>`).join('')}
+        </select>
+      </td>
+      <td style="padding:0.4rem 0.85rem;">
+        <div class="status-badge ${sc}">
+          <div class="dot ${dot}"></div>
+          <select class="sel-statut" style="background:transparent;padding:0;width:auto;font-size:0.72rem;font-weight:600;" onchange="maj(${d.id},'statut',this.value)">
+            ${['À faire','En cours','Vendu'].map(o=>`<option${d.statut===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </td>
+      <td><span class="cell-calc muted">${fK(d.invest)}</span></td>
+      <td style="white-space:nowrap;padding:0.4rem 0.85rem;text-align:right;">
+        <span style="font-size:0.82rem;font-weight:600;color:${cb}">${d.benefTot>=0?'+':''}${fK(d.benefTot)}</span>
+        <div style="height:3px;background:var(--surface2);border-radius:2px;margin-top:3px;">
+          <div style="width:${pct}%;height:100%;background:${cb};border-radius:2px;"></div>
+        </div>
+      </td>
+      <td style="text-align:center;padding:0.4rem 0.5rem;"><span class="rend ${rc}">${d.rend.toFixed(2)}×</span></td>
+      <td><button class="btn-del" onclick="supprimerLigne(${d.id})" title="Supprimer">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function ajouterLigne() {
+  const id=Date.now();
+  items.push({id,nom:'',lot:0,fm:0,qte:1,vente:0,diff:'Moyen',statut:'À faire'});
+  sauvegarder(); rendreDashboard();
+  setTimeout(()=>{const inp=document.querySelector(`#tr-${id} input`);if(inp)inp.focus();},50);
+}
+function supprimerLigne(id){items=items.filter(i=>i.id!==id);sauvegarder();rendreDashboard();}
+function maj(id,champ,val){const item=items.find(i=>i.id===id);if(item){item[champ]=val;sauvegarder();rendreDashboard();}}
+function trier(col){if(colTri===col)dirTri*=-1;else{colTri=col;dirTri=-1;}rendrTableau();}
+function fK(n){if(!n&&n!==0)return'—';const a=Math.abs(n),s=n<0?'-':'';if(a>=1000000)return s+(a/1000000).toFixed(2)+'m';if(a>=1000)return s+Math.round(a/1000)+'k';return s+Math.round(a);}
+function esc(s){return String(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function flash(msg){const d=document.createElement('div');d.className='flash-msg';d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),2000);}
+
+rendreDashboard();
+setInterval(sauvegarder,30000);
+</script>
+</body>
+</html>
