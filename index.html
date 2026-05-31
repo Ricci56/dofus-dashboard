@@ -1,1 +1,640 @@
-file:///C:/Users/Freddy/Downloads/index.html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dofus Craft Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#f8f9fb; --surface:#ffffff; --surface2:#f1f3f7;
+  --border:#e2e6ee; --border2:#c9d0de;
+  --text:#1a1d27; --text2:#5a6278; --text3:#9098b0;
+  --gold:#b8860b; --gold-bg:#fdf7e3; --gold-border:#f0d060;
+  --green:#1a7a4a; --green-bg:#eaf7f0; --green-border:#a3dfc0;
+  --red:#c0392b; --red-bg:#fdf0ef; --red-border:#f5b8b3;
+  --orange:#c47d10; --orange-bg:#fef6e4; --orange-border:#f8d98a;
+  --blue:#1a5fa8; --blue-bg:#eaf2fd; --blue-border:#a8ccf5;
+  --radius:10px; --radius-sm:6px;
+  --shadow:0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px var(--border);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;font-size:14px;}
+.page{max-width:1400px;margin:0 auto;padding:2rem 1.5rem;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
+.header-left{display:flex;align-items:center;gap:12px;}
+.logo{width:40px;height:40px;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.header-title{font-size:1.25rem;font-weight:700;}
+.header-sub{font-size:0.8rem;color:var(--text3);margin-top:1px;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border);}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.25rem;}
+.stat-label{font-size:0.72rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.stat-val{font-size:1.6rem;font-weight:700;line-height:1;}
+.stat-val.v{color:var(--green);}.stat-val.r{color:var(--red);}.stat-val.g{color:var(--gold);}
+.stat-sub{font-size:0.75rem;color:var(--text3);margin-top:4px;}
+.stat-icon{float:right;font-size:1.4rem;opacity:0.18;margin-top:-2px;}
+.grille-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+@media(max-width:700px){.grille-2{grid-template-columns:1fr;}}
+.carte-g{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:0.85rem 1rem;}
+.carte-titre{font-size:0.72rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--text3);margin-bottom:0.6rem;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin:1.5rem 0 0.75rem;flex-wrap:wrap;gap:0.5rem;}
+.section-title{font-size:0.85rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--text2);}
+.toolbar{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
+.btn{font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:500;padding:0.45rem 0.9rem;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;border-radius:var(--radius-sm);transition:all 0.15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.btn:hover{background:var(--surface2);color:var(--text);}
+.btn.vert{border-color:var(--green-border);background:var(--green-bg);color:var(--green);}
+.btn.vert:hover{filter:brightness(0.96);}
+.btn.rouge{border-color:var(--red-border);background:var(--red-bg);color:var(--red);}
+.btn.rouge:hover{filter:brightness(0.96);}
+.champ{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.45rem 0.75rem;font-family:'Inter',sans-serif;font-size:0.85rem;border-radius:var(--radius-sm);outline:none;transition:border 0.15s;}
+.champ:focus{border-color:var(--blue);}
+.champ::placeholder{color:var(--text3);}
+.table-wrap{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.table-inner{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+thead{border-bottom:2px solid var(--border);}
+thead th{font-size:0.7rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);padding:0.7rem 0.85rem;text-align:left;background:var(--surface2);white-space:nowrap;cursor:pointer;user-select:none;}
+thead th:hover{color:var(--text2);}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface2);}
+td{padding:0;vertical-align:middle;}
+.cell-edit{display:block;width:100%;padding:0.55rem 0.85rem;background:transparent;border:none;color:var(--text);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;cursor:pointer;}
+.cell-edit:focus{background:var(--blue-bg);outline:2px solid var(--blue);outline-offset:-2px;cursor:text;border-radius:4px;}
+.cell-edit.kamas{font-size:0.82rem;text-align:right;font-weight:500;}
+.cell-edit.centre{text-align:center;}
+.cell-calc{display:block;padding:0.55rem 0.85rem;font-size:0.82rem;font-weight:600;text-align:right;}
+.cell-calc.muted{color:var(--text2);font-weight:500;}
+.sel-statut{background:transparent;border:none;color:inherit;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;width:100%;padding:0.5rem 0.6rem;outline:none;appearance:none;}
+.sel-statut:focus{background:var(--surface2);}
+option{background:var(--surface);color:var(--text);}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.72rem;font-weight:600;}
+.sb-v{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.sb-e{background:var(--orange-bg);color:var(--orange);border:1px solid var(--orange-border);}
+.sb-a{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dot-v{background:var(--green);}.dot-e{background:var(--orange);}.dot-a{background:var(--blue);}
+.rend{display:inline-block;padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:600;}
+.rend-v{background:var(--green-bg);color:var(--green);}
+.rend-o{background:var(--orange-bg);color:var(--orange);}
+.rend-r{background:var(--red-bg);color:var(--red);}
+.btn-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:1rem;padding:0.55rem 0.6rem;width:100%;transition:color 0.15s;}
+.btn-del:hover{color:var(--red);}
+.btn-recipe{background:none;border:none;cursor:pointer;font-size:1rem;padding:0.4rem 0.5rem;border-radius:4px;color:var(--text3);line-height:1;transition:all 0.15s;display:block;width:100%;text-align:center;}
+.btn-recipe:hover{color:var(--gold);background:var(--gold-bg);}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.flash-msg{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface);border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,0.12);color:var(--text);padding:0.75rem 1.25rem;font-size:0.82rem;border-radius:var(--radius);z-index:9999;animation:slideUp 0.25s ease;}
+
+/* MODALE */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,22,32,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.hidden{display:none;}
+.modal{background:var(--surface);border-radius:var(--radius);box-shadow:0 8px 40px rgba(0,0,0,0.18);width:100%;max-width:520px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-head-title{font-size:0.95rem;font-weight:700;}
+.modal-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text3);padding:4px 8px;border-radius:4px;}
+.modal-close:hover{color:var(--text);background:var(--surface2);}
+.modal-body{padding:1.25rem;overflow-y:auto;flex:1;}
+.modal-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);flex-shrink:0;}
+.api-search-row{display:flex;gap:8px;margin-bottom:0.75rem;}
+.api-status{font-size:0.78rem;color:var(--text3);min-height:20px;margin-bottom:0.5rem;}
+.api-results{display:flex;flex-direction:column;gap:4px;}
+.api-result-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:background 0.1s;}
+.api-result-item:hover{background:var(--surface2);border-color:var(--border2);}
+.api-result-img{width:32px;height:32px;border-radius:4px;object-fit:contain;background:var(--surface2);flex-shrink:0;}
+.api-result-img-ph{width:32px;height:32px;border-radius:4px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.api-result-name{font-size:0.85rem;font-weight:500;}
+.api-result-meta{font-size:0.72rem;color:var(--text3);margin-top:1px;}
+.api-badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:0.68rem;font-weight:600;background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);margin-left:6px;}
+.recipe-panel{display:none;}
+.recipe-panel.visible{display:block;}
+.recipe-item-header{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:1rem;}
+.recipe-item-img{width:44px;height:44px;border-radius:6px;object-fit:contain;background:var(--surface);border:1px solid var(--border);flex-shrink:0;}
+.recipe-item-img-ph{width:44px;height:44px;border-radius:6px;background:var(--surface);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;}
+.recipe-item-name{font-size:0.95rem;font-weight:600;}
+.recipe-item-sub{font-size:0.75rem;color:var(--text3);margin-top:2px;}
+.qty-row{display:flex;align-items:center;gap:10px;margin-bottom:1rem;}
+.qty-row label{font-size:0.78rem;font-weight:600;color:var(--text2);}
+.qty-input{width:72px;text-align:center;padding:0.35rem 0.5rem;border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:500;background:var(--surface);color:var(--text);outline:none;}
+.qty-input:focus{border-color:var(--blue);}
+.ing-section-title{font-size:0.68rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.ing-table{width:100%;border-collapse:collapse;margin-bottom:1rem;}
+.ing-table thead th{font-size:0.68rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:var(--text3);padding:5px 8px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.ing-table thead th:last-child{text-align:right;}
+.ing-table tbody tr{border-bottom:1px solid var(--border);}
+.ing-table tbody tr:last-child{border-bottom:none;}
+.ing-table td{padding:7px 8px;vertical-align:middle;}
+.ing-img{width:28px;height:28px;border-radius:3px;object-fit:contain;background:var(--surface2);display:block;}
+.ing-img-ph{width:28px;height:28px;border-radius:3px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:0.75rem;color:var(--text3);}
+.ing-name{font-size:0.82rem;}
+.ing-qty{font-size:0.8rem;color:var(--text2);text-align:center;font-weight:500;}
+.price-cell{text-align:right;white-space:nowrap;}
+.price-inp{width:95px;text-align:right;padding:4px 7px;border:1px solid var(--border2);border-radius:4px;font-family:'Inter',sans-serif;font-size:0.82rem;background:var(--surface);color:var(--text);outline:none;}
+.price-inp:focus{border-color:var(--blue);}
+.price-unit{font-size:0.7rem;color:var(--text3);margin-left:3px;}
+.cost-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.cost-card{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border);}
+.cost-card-label{font-size:0.67rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--text3);margin-bottom:4px;}
+.cost-card-val{font-size:1.2rem;font-weight:700;color:var(--text);}
+.btn-use-cost{width:100%;padding:0.65rem;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.15s;border:1px solid var(--gold-border);background:var(--gold-bg);color:var(--gold);display:block;text-align:center;}
+.btn-use-cost:hover:not(:disabled){filter:brightness(0.95);}
+.btn-use-cost:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-use-cost-hint{font-size:0.72rem;color:var(--text3);text-align:center;margin-top:5px;}
+.modal-back{background:none;border:none;font-size:0.78rem;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:0;margin-bottom:0.85rem;}
+.modal-back:hover{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">&#9879;</div>
+      <div>
+        <div class="header-title">Craft Dashboard</div>
+        <div class="header-sub">Dofus 3 &middot; Draconiros &mdash; cliquez sur une cellule pour &eacute;diter</div>
+      </div>
+    </div>
+    <span class="badge">Dofus 3</span>
+  </header>
+
+  <div class="stats-grid" id="stats"></div>
+
+  <div class="grille-2">
+    <div class="carte-g">
+      <div class="carte-titre">B&eacute;n&eacute;fice net par item (top 10)</div>
+      <canvas id="chart-b" height="60"></canvas>
+    </div>
+    <div class="carte-g">
+      <div class="carte-titre">R&eacute;partition des statuts</div>
+      <canvas id="chart-s" height="60"></canvas>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">&#128203; Suivi des crafts</div>
+    <div class="toolbar">
+      <button class="btn vert" onclick="ajouterLigne()">&#65291; Ajouter un item</button>
+      <button class="btn" onclick="sauvegarder()">&#128190; Sauvegarder</button>
+      <button class="btn" onclick="exporterJSON()">&#8595; JSON</button>
+      <label class="btn" style="cursor:pointer;">&#8593; Importer<input type="file" accept=".json" onchange="importerJSON(event)" style="display:none;"></label>
+      <input type="text" class="champ" id="recherche" placeholder="Rechercher un item&hellip;" oninput="rendreDashboard()" style="width:190px;">
+      <select class="champ" id="filtre-statut" onchange="rendreDashboard()">
+        <option value="">Tous statuts</option>
+        <option value="Vendu">Vendu</option>
+        <option value="En cours">En cours</option>
+        <option value="A faire">A faire</option>
+      </select>
+      <button class="btn rouge" onclick="toutEffacer()">Effacer tout</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-inner">
+      <table id="tableau">
+        <thead>
+          <tr>
+            <th style="width:6px;padding:0;"></th>
+            <th onclick="trier('nom')">Nom de l'item</th>
+            <th style="width:42px;padding:0;text-align:center;" title="Calculateur de recette API">&#9879;</th>
+            <th onclick="trier('lot')" style="text-align:right;">Prix du lot</th>
+            <th onclick="trier('fm')" style="text-align:right;">Prix FM</th>
+            <th onclick="trier('qte')" style="text-align:center;">Qt&eacute;</th>
+            <th onclick="trier('vente')" style="text-align:right;">Vente / u</th>
+            <th onclick="trier('diff')">Difficult&eacute;</th>
+            <th onclick="trier('statut')">Statut</th>
+            <th onclick="trier('invest')" style="text-align:right;">Investi</th>
+            <th onclick="trier('benefice')" style="text-align:right;">B&eacute;n&eacute;fice net</th>
+            <th onclick="trier('rendement')" style="text-align:center;">Rendement</th>
+            <th style="width:36px;"></th>
+          </tr>
+        </thead>
+        <tbody id="corps"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE RECETTE -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-title">&#9879; Calculateur de recette</div>
+      <button class="modal-close" id="modal-close-btn">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div id="vue-recherche">
+        <div class="api-search-row">
+          <input type="text" class="champ" id="api-input" placeholder="Ex : Dofus Turquoise, Arc en Corne&hellip;" style="flex:1;">
+          <button class="btn" id="api-search-btn">Rechercher</button>
+        </div>
+        <div class="api-status" id="api-status"></div>
+        <div class="api-results" id="api-results"></div>
+      </div>
+      <div class="recipe-panel" id="vue-recette">
+        <button class="modal-back" id="modal-back-btn">&#8592; Nouvelle recherche</button>
+        <div class="recipe-item-header" id="recipe-header"></div>
+        <div class="qty-row">
+          <label for="craft-qty">Quantit&eacute; &agrave; crafter :</label>
+          <input type="number" class="qty-input" id="craft-qty" value="1" min="1" max="999">
+        </div>
+        <div class="ing-section-title">Ingr&eacute;dients</div>
+        <table class="ing-table">
+          <thead>
+            <tr>
+              <th style="width:32px;"></th>
+              <th>Item</th>
+              <th style="text-align:center;">Qt&eacute;</th>
+              <th style="text-align:right;">Prix / u (k)</th>
+            </tr>
+          </thead>
+          <tbody id="ing-body"></tbody>
+        </table>
+        <div class="cost-summary" id="cost-summary"></div>
+      </div>
+    </div>
+    <div class="modal-footer" id="modal-footer" style="display:none;">
+      <button class="btn-use-cost" id="btn-use-cost" disabled>
+        &#10003; Utiliser ce co&ucirc;t comme &ldquo;Prix du lot&rdquo;
+      </button>
+      <div class="btn-use-cost-hint" id="use-cost-hint">Renseignez tous les prix pour activer</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLE = 'dofus_craft_v2';
+const API_BASE = 'https://api.dofusdu.de/dofus3/v1/fr';
+let items = chargerDonnees();
+let colTri = 'benefice', dirTri = -1;
+let chartB = null, chartS = null;
+let modalItemId = null, recetteActive = null, prixIngredients = {};
+
+function chargerDonnees(){
+  try{var s=localStorage.getItem(CLE);return s?JSON.parse(s):exemples();}catch(e){return exemples();}
+}
+function exemples(){
+  return[
+    {id:1,nom:'Coiffe Padgref',  lot:5000000, fm:200000,qte:5,vente:1500000,diff:'Moyen',    statut:'Vendu'},
+    {id:2,nom:'Baguette torke',  lot:11000000,fm:500000,qte:2,vente:5800000,diff:'Difficile',statut:'En cours'},
+    {id:3,nom:'Epee du Bouftou', lot:2000000, fm:100000,qte:3,vente:500000, diff:'Facile',   statut:'A faire'},
+  ];
+}
+function sauvegarder(){localStorage.setItem(CLE,JSON.stringify(items));flash('Sauvegarde OK');}
+function exporterJSON(){
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(items,null,2)],{type:'application/json'}));
+  a.download='craft_dofus.json';a.click();
+}
+function importerJSON(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){try{items=JSON.parse(ev.target.result);sauvegarder();rendreDashboard();flash('Importe !');}catch(err){alert('Fichier invalide');}};
+  r.readAsText(f);
+}
+function toutEffacer(){if(confirm('Effacer tous les items ?')){items=[];sauvegarder();rendreDashboard();}}
+function calculer(item){
+  var invest=(item.lot||0)+(item.fm||0);
+  var ppu=item.qte>0?invest/item.qte:0;
+  var taxe=(item.vente||0)*0.02;
+  var venteN=(item.vente||0)-taxe;
+  var benefItem=venteN-ppu;
+  var benefTot=benefItem*(item.qte||1);
+  var rend=invest>0?(invest+benefTot)/invest:0;
+  return{invest:invest,ppu:ppu,venteN:venteN,benefTot:benefTot,rend:rend};
+}
+function rendreDashboard(){rendrStats();rendreGraphiques();rendrTableau();}
+function rendrStats(){
+  var calc=items.map(function(i){return Object.assign({},i,calculer(i));});
+  var totalI=calc.reduce(function(s,i){return s+i.invest;},0);
+  var totalB=calc.reduce(function(s,i){return s+i.benefTot;},0);
+  var rentab=calc.filter(function(i){return i.benefTot>0;}).length;
+  var vendus=items.filter(function(i){return i.statut==='Vendu';}).length;
+  var cours=items.filter(function(i){return i.statut==='En cours';}).length;
+  var sorted=calc.slice().sort(function(a,b){return b.benefTot-a.benefTot;});
+  var meill=sorted[0];
+  var rendM=calc.length?calc.reduce(function(s,i){return s+i.rend;},0)/calc.length:0;
+  var cards=[
+    {l:'Items traces',   v:items.length,        cls:'',  s:rentab+' rentables',    icon:'&#128230;'},
+    {l:'Total investi',  v:fK(totalI),           cls:'g', s:'kamas mises',          icon:'&#128176;'},
+    {l:'Benefice total', v:fK(totalB),           cls:totalB>=0?'v':'r',s:'apres taxe HDV (2%)',icon:'&#128200;'},
+    {l:'Items vendus',   v:vendus,               cls:'v', s:cours+' en cours',      icon:'&#10003;'},
+    {l:'Rendement moy',  v:rendM.toFixed(2)+'x',cls:rendM>=1.1?'v':'',s:'multiplicateur',icon:'&#9889;'},
+    {l:'Meilleur item',  v:meill?meill.nom.split(' ').slice(0,2).join(' '):'---',cls:'g',s:meill?fK(meill.benefTot):'---',icon:'&#127942;'},
+  ];
+  document.getElementById('stats').innerHTML=cards.map(function(s){
+    return '<div class="stat-card"><div class="stat-label">'+s.l+' <span class="stat-icon">'+s.icon+'</span></div><div class="stat-val '+s.cls+'">'+s.v+'</div><div class="stat-sub">'+s.s+'</div></div>';
+  }).join('');
+}
+function rendreGraphiques(){
+  var calc=items.map(function(i){return Object.assign({},i,calculer(i));}).sort(function(a,b){return b.benefTot-a.benefTot;}).slice(0,10);
+  var opts={responsive:true,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:'#9098b0',font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'}},
+            y:{ticks:{color:'#9098b0',callback:function(v){return fK(v);},font:{size:9}},grid:{color:'rgba(0,0,0,0.05)'}}}};
+  if(chartB)chartB.destroy();
+  chartB=new Chart(document.getElementById('chart-b'),{
+    type:'bar',
+    data:{labels:calc.map(function(d){return d.nom.length>14?d.nom.slice(0,14)+'...':d.nom;}),
+      datasets:[{label:'Benefice',data:calc.map(function(d){return d.benefTot;}),
+        backgroundColor:calc.map(function(d){return d.benefTot>=0?'rgba(26,122,74,0.8)':'rgba(192,57,43,0.8)';}),
+        borderColor:calc.map(function(d){return d.benefTot>=0?'#1a7a4a':'#c0392b';}),
+        borderWidth:1,borderRadius:4}]},options:opts});
+  var v=items.filter(function(i){return i.statut==='Vendu';}).length;
+  var c=items.filter(function(i){return i.statut==='En cours';}).length;
+  var f=items.filter(function(i){return i.statut==='A faire';}).length;
+  var a=items.length-v-c-f;
+  if(chartS)chartS.destroy();
+  chartS=new Chart(document.getElementById('chart-s'),{
+    type:'doughnut',
+    data:{labels:['Vendu','En cours','A faire','Autre'],
+      datasets:[{data:[v,c,f,a],
+        backgroundColor:['rgba(26,122,74,0.85)','rgba(196,125,16,0.85)','rgba(26,95,168,0.85)','rgba(144,152,176,0.5)'],
+        borderColor:['#1a7a4a','#c47d10','#1a5fa8','#9098b0'],borderWidth:2}]},
+    options:{responsive:true,plugins:{legend:{labels:{color:'#5a6278',font:{size:11},padding:14}}},cutout:'58%'}});
+}
+function rendrTableau(){
+  var rech=document.getElementById('recherche').value.toLowerCase();
+  var filSt=document.getElementById('filtre-statut').value;
+  var data=items.map(function(i){return Object.assign({},i,calculer(i));});
+  if(rech)data=data.filter(function(d){return d.nom.toLowerCase().indexOf(rech)>=0;});
+  if(filSt)data=data.filter(function(d){return d.statut===filSt;});
+  var map={nom:'nom',lot:'lot',fm:'fm',qte:'qte',vente:'vente',diff:'diff',statut:'statut',invest:'invest',benefice:'benefTot',rendement:'rend'};
+  var k=map[colTri]||colTri;
+  data.sort(function(a,b){var av=a[k]!=null?a[k]:'',bv=b[k]!=null?b[k]:'';return typeof av==='number'?(av-bv)*dirTri:String(av).localeCompare(String(bv))*dirTri;});
+  var maxB=Math.max.apply(null,data.map(function(d){return Math.abs(d.benefTot);}).concat([1]));
+  document.getElementById('corps').innerHTML=data.map(function(d){
+    var pct=Math.min(Math.abs(d.benefTot)/maxB*100,100);
+    var cb=d.benefTot>=0?'#1a7a4a':'#c0392b';
+    var rc=d.rend>=1.1?'rend-v':d.rend>=1?'rend-o':'rend-r';
+    var sc=d.statut==='Vendu'?'sb-v':d.statut==='En cours'?'sb-e':'sb-a';
+    var dot=d.statut==='Vendu'?'dot-v':d.statut==='En cours'?'dot-e':'dot-a';
+    return '<tr id="tr-'+d.id+'">'
+      +'<td style="padding:0;width:6px;"><div style="width:4px;height:100%;min-height:38px;background:'+cb+';border-radius:4px 0 0 4px;"></div></td>'
+      +'<td><input class="cell-edit" value="'+esc(d.nom)+'" placeholder="Nom" onchange="maj('+d.id+',\'nom\',this.value)" style="min-width:140px;"/></td>'
+      +'<td style="padding:0;width:42px;text-align:center;"><button class="btn-recipe" onclick="ouvrirModal('+d.id+')" title="Calculateur de recette">&#9879;</button></td>'
+      +'<td><input class="cell-edit kamas" type="number" value="'+(d.lot||'')+'" placeholder="0" onchange="maj('+d.id+',\'lot\',+this.value)" style="width:110px;"/></td>'
+      +'<td><input class="cell-edit kamas" type="number" value="'+(d.fm||'')+'" placeholder="0" onchange="maj('+d.id+',\'fm\',+this.value)" style="width:100px;"/></td>'
+      +'<td><input class="cell-edit centre" type="number" value="'+(d.qte||1)+'" min="1" onchange="maj('+d.id+',\'qte\',+this.value)" style="width:60px;"/></td>'
+      +'<td><input class="cell-edit kamas" type="number" value="'+(d.vente||'')+'" placeholder="0" onchange="maj('+d.id+',\'vente\',+this.value)" style="width:110px;"/></td>'
+      +'<td style="padding:0.5rem 0.85rem;"><select class="sel-statut" onchange="maj('+d.id+',\'diff\',this.value)" style="width:auto;">'
+      +['Facile','Moyen','Difficile'].map(function(o){return '<option'+(d.diff===o?' selected':'')+'>'+o+'</option>';}).join('')
+      +'</select></td>'
+      +'<td style="padding:0.4rem 0.85rem;"><div class="status-badge '+sc+'"><div class="dot '+dot+'"></div>'
+      +'<select class="sel-statut" style="background:transparent;padding:0;width:auto;font-size:0.72rem;font-weight:600;" onchange="maj('+d.id+',\'statut\',this.value)">'
+      +['A faire','En cours','Vendu'].map(function(o){return '<option'+(d.statut===o?' selected':'')+'>'+o+'</option>';}).join('')
+      +'</select></div></td>'
+      +'<td><span class="cell-calc muted">'+fK(d.invest)+'</span></td>'
+      +'<td style="white-space:nowrap;padding:0.4rem 0.85rem;text-align:right;"><span style="font-size:0.82rem;font-weight:600;color:'+cb+'">'+(d.benefTot>=0?'+':'')+fK(d.benefTot)+'</span>'
+      +'<div style="height:3px;background:var(--surface2);border-radius:2px;margin-top:3px;"><div style="width:'+pct+'%;height:100%;background:'+cb+';border-radius:2px;"></div></div></td>'
+      +'<td style="text-align:center;padding:0.4rem 0.5rem;"><span class="rend '+rc+'">'+d.rend.toFixed(2)+'x</span></td>'
+      +'<td><button class="btn-del" onclick="supprimerLigne('+d.id+')" title="Supprimer">&#x2715;</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+/* MODALE */
+function ouvrirModal(id){
+  modalItemId=id; prixIngredients={}; recetteActive=null;
+  var item=items.find(function(i){return i.id===id;});
+  document.getElementById('api-input').value=item&&item.nom?item.nom:'';
+  document.getElementById('api-status').textContent='';
+  document.getElementById('api-results').innerHTML='';
+  document.getElementById('vue-recherche').style.display='block';
+  document.getElementById('vue-recette').classList.remove('visible');
+  document.getElementById('modal-footer').style.display='none';
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  if(item&&item.nom) apiRechercher();
+  else setTimeout(function(){document.getElementById('api-input').focus();},50);
+}
+function fermerModal(){
+  document.getElementById('modal-overlay').classList.add('hidden');
+  modalItemId=null; recetteActive=null; prixIngredients={};
+}
+function retourRecherche(){
+  document.getElementById('vue-recherche').style.display='block';
+  document.getElementById('vue-recette').classList.remove('visible');
+  document.getElementById('modal-footer').style.display='none';
+}
+
+/* API */
+async function apiRechercher(){
+  var q=document.getElementById('api-input').value.trim();
+  if(!q){document.getElementById('api-status').textContent='Entrez un nom.';return;}
+  document.getElementById('api-status').textContent='Recherche en cours...';
+  document.getElementById('api-results').innerHTML='';
+  try{
+    var cats=[
+      {key:'equipment',label:'Equipement'},
+      {key:'consumables',label:'Consommable'},
+      {key:'resources',label:'Ressource'},
+    ];
+    var promises=cats.map(function(c){
+      return fetch(API_BASE+'/items/'+c.key+'/search?query='+encodeURIComponent(q)+'&limit=4')
+        .then(function(r){return r.ok?r.json():[];})
+        .then(function(d){
+          return Array.isArray(d)?d.map(function(i){return Object.assign({},i,{_cat:c.key,_catLabel:c.label});}):[];
+        }).catch(function(){return[];});
+    });
+    var all=await Promise.all(promises);
+    var resultats=[].concat.apply([],all);
+    // deduplicate
+    var seen={};
+    resultats=resultats.filter(function(i){if(seen[i.ankama_id])return false;seen[i.ankama_id]=true;return true;});
+    if(!resultats.length){document.getElementById('api-status').textContent='Aucun resultat.';return;}
+    document.getElementById('api-status').textContent=resultats.length+' resultat(s) - cliquez pour la recette';
+    afficherResultats(resultats);
+  }catch(err){
+    document.getElementById('api-status').textContent='Erreur API. Verifiez votre connexion.';
+  }
+}
+function afficherResultats(resultats){
+  var cont=document.getElementById('api-results');
+  cont.innerHTML='';
+  resultats.slice(0,8).forEach(function(item){
+    var div=document.createElement('div');
+    div.className='api-result-item';
+    var imgUrl=item.image_urls&&(item.image_urls.icon||item.image_urls.sd||item.image_urls.hd)||'';
+    div.innerHTML=(imgUrl
+      ?'<img class="api-result-img" src="'+imgUrl+'" alt="" onerror="this.style.display=\'none\'">'
+      :'<div class="api-result-img-ph">&#128230;</div>')
+      +'<div><div class="api-result-name">'+esc(item.name)+'<span class="api-badge">'+item._catLabel+'</span></div>'
+      +'<div class="api-result-meta">Niveau '+(item.level||'?')+' - ID '+item.ankama_id+'</div></div>'
+      +'<span style="margin-left:auto;color:var(--text3);">&#8250;</span>';
+    div.addEventListener('click',function(){chargerRecette(item);});
+    cont.appendChild(div);
+  });
+}
+async function chargerRecette(item){
+  document.getElementById('api-status').textContent='Chargement de la recette...';
+  try{
+    var res=await fetch(API_BASE+'/items/'+item._cat+'/'+item.ankama_id+'?fields[item]=recipe');
+    if(!res.ok){document.getElementById('api-status').textContent='Impossible de charger le detail.';return;}
+    var detail=await res.json();
+
+    // Debug: log raw response to console
+    console.log('[Dofus Recipe] Raw detail:', JSON.stringify(detail).slice(0,2000));
+
+    if(!detail.recipe||!detail.recipe.length){
+      document.getElementById('api-status').textContent='"'+item.name+'" n\'a pas de recette connue.';
+      return;
+    }
+
+    // Resoudre les ingredients : l'API peut retourner ing.item.name OU juste ing.ankama_id
+    var recipe=detail.recipe;
+    console.log('[Dofus Recipe] First ingredient raw:', JSON.stringify(recipe[0]));
+
+    var cats=['resources','consumables','equipment','cosmetics','quest_items'];
+    var resolvePromises=recipe.map(async function(ing,idx){
+      // Cas 1 : ing.item existe avec un name => deja bon
+      if(ing.item && ing.item.name) return ing;
+      // Cas 2 : chercher l'id de l'ingredient
+      var ingId = ing.ankama_id || (ing.item && ing.item.ankama_id) || ing.item_ankama_id || ing.id;
+      console.log('[Dofus Recipe] Ingredient '+idx+' id:', ingId, 'raw:', JSON.stringify(ing));
+      if(!ingId) return ing;
+      for(var c=0;c<cats.length;c++){
+        try{
+          var r=await fetch(API_BASE+'/items/'+cats[c]+'/'+ingId);
+          if(r.ok){
+            var d=await r.json();
+            console.log('[Dofus Recipe] Resolved ing '+idx+' via '+cats[c]+':', d.name);
+            return Object.assign({},ing,{item:d});
+          }
+        }catch(e){}
+      }
+      return ing;
+    });
+
+    document.getElementById('api-status').textContent='Resolution des ingredients ('+recipe.length+')...';
+    var recipeResolved=await Promise.all(resolvePromises);
+    detail.recipe=recipeResolved;
+
+    recetteActive=Object.assign({},detail,{
+      _cat:item._cat,
+      _imgUrl:item.image_urls&&(item.image_urls.icon||item.image_urls.sd)||''
+    });
+    prixIngredients={};
+    document.getElementById('craft-qty').value=1;
+    afficherRecette();
+  }catch(err){
+    document.getElementById('api-status').textContent='Erreur: '+err.message;
+    console.error('[Dofus Recipe] Error:', err);
+  }
+}
+function afficherRecette(){
+  if(!recetteActive)return;
+  var item=recetteActive;
+  var imgUrl=item._imgUrl||'';
+  document.getElementById('recipe-header').innerHTML=
+    (imgUrl?'<img class="recipe-item-img" src="'+imgUrl+'" alt="" onerror="this.style.display=\'none\'">'
+           :'<div class="recipe-item-img-ph">&#9879;</div>')
+    +'<div><div class="recipe-item-name">'+esc(item.name)+'</div>'
+    +'<div class="recipe-item-sub">Niveau '+(item.level||'?')+' - '+(item.type&&item.type.name||'')+'</div></div>';
+
+  var qty=parseInt(document.getElementById('craft-qty').value)||1;
+  document.getElementById('ing-body').innerHTML=item.recipe.map(function(ing,i){
+    // L'API retourne ing.item avec name et image_urls
+    var imgIng=ing.item&&ing.item.image_urls&&(ing.item.image_urls.icon||ing.item.image_urls.sd||ing.item.image_urls.hd)||'';
+    var nom=ing.item&&ing.item.name?ing.item.name:'Ingredient #'+i;
+    var qteTotal=ing.quantity*qty;
+    var valPrix=prixIngredients[i]!==undefined?prixIngredients[i]:'';
+    var ingId=ing.item&&ing.item.ankama_id||ing.ankama_id||'';
+    var catIng=ing._cat||'resources';
+    var slug=nom.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    return '<tr>'
+      +'<td>'+(imgIng
+        ?'<img class="ing-img" src="'+imgIng+'" alt="" onerror="this.style.display=\'none\'">'
+        :'<div class="ing-img-ph">?</div>')+'</td>'
+      +'<td>'+(ingId?'<div style="display:flex;align-items:center;gap:6px;"><span class="ing-name">'+esc(nom)+'</span><a href="https://www.dofus.com/fr/encyclopedie/'+catIng+'/'+ingId+'-'+slug+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;border:1px solid var(--border);color:var(--text3);text-decoration:none;font-size:0.65rem;flex-shrink:0;" title="Encyclopedie Dofus">&#8599;</a></div>':'<span class="ing-name">'+esc(nom)+'</span>')+'</td>'
+      +'<td class="ing-qty" id="ing-qty-'+i+'">x '+qteTotal+'</td>'
+      +'<td class="price-cell">'
+      +'<input type="number" class="price-inp" id="prix-'+i+'" value="'+valPrix+'" placeholder="0" min="0" step="1" '
+      +'data-base-qty="'+ing.quantity+'" data-idx="'+i+'" oninput="onPrixChange('+i+',this.value)">'
+      +'<span class="price-unit">k</span></td>'
+      +'</tr>';
+  }).join('');
+
+  mettreAJourResume();
+  document.getElementById('vue-recherche').style.display='none';
+  document.getElementById('vue-recette').classList.add('visible');
+  document.getElementById('modal-footer').style.display='block';
+}
+function onPrixChange(i,val){
+  prixIngredients[i]=parseFloat(val)||0;
+  mettreAJourResume();
+}
+function mettreAJourRecette(){
+  if(!recetteActive)return;
+  var qty=parseInt(document.getElementById('craft-qty').value)||1;
+  recetteActive.recipe.forEach(function(ing,i){
+    var el=document.getElementById('ing-qty-'+i);
+    if(el)el.textContent='x '+(ing.quantity*qty);
+  });
+  mettreAJourResume();
+}
+function mettreAJourResume(){
+  if(!recetteActive)return;
+  var qty=parseInt(document.getElementById('craft-qty').value)||1;
+  var recipe=recetteActive.recipe;
+  var totalCout=recipe.reduce(function(sum,ing,i){return sum+(prixIngredients[i]||0)*ing.quantity*qty;},0);
+  var coutParUnit=qty>0?totalCout/qty:0;
+  var nbRenseignes=recipe.filter(function(_,i){return prixIngredients[i]>0;}).length;
+  var tousRenseignes=nbRenseignes===recipe.length&&recipe.length>0;
+  document.getElementById('cost-summary').innerHTML=
+    '<div class="cost-card"><div class="cost-card-label">Cout total craft</div><div class="cost-card-val">'+fK(Math.round(totalCout*1000))+' k</div></div>'
+    +'<div class="cost-card"><div class="cost-card-label">Cout / unite</div><div class="cost-card-val">'+fK(Math.round(coutParUnit*1000))+' k</div></div>'
+    +'<div class="cost-card"><div class="cost-card-label">Complete</div><div class="cost-card-val">'+nbRenseignes+' / '+recipe.length+'</div></div>';
+  var btn=document.getElementById('btn-use-cost');
+  var hint=document.getElementById('use-cost-hint');
+  if(tousRenseignes&&totalCout>0){
+    btn.disabled=false;
+    hint.textContent='Injectera '+fK(Math.round(totalCout*1000))+' k dans "Prix du lot"';
+  }else{
+    btn.disabled=true;
+    hint.textContent='Renseignez tous les prix pour activer';
+  }
+}
+function utiliserCout(){
+  if(!recetteActive||!modalItemId)return;
+  var qty=parseInt(document.getElementById('craft-qty').value)||1;
+  var totalCout=recetteActive.recipe.reduce(function(sum,ing,i){return sum+(prixIngredients[i]||0)*ing.quantity*qty;},0);
+  var totalKamas=Math.round(totalCout*1000);
+  maj(modalItemId,'lot',totalKamas);
+  flash('Recette appliquee : '+fK(totalKamas)+' k dans "Prix du lot"');
+  fermerModal();
+}
+
+/* UTILS */
+function ajouterLigne(){
+  var id=Date.now();
+  items.push({id:id,nom:'',lot:0,fm:0,qte:1,vente:0,diff:'Moyen',statut:'A faire'});
+  sauvegarder();rendreDashboard();
+  setTimeout(function(){var inp=document.querySelector('#tr-'+id+' input');if(inp)inp.focus();},50);
+}
+function supprimerLigne(id){items=items.filter(function(i){return i.id!==id;});sauvegarder();rendreDashboard();}
+function maj(id,champ,val){var item=items.find(function(i){return i.id===id;});if(item){item[champ]=val;sauvegarder();rendreDashboard();}}
+function trier(col){if(colTri===col)dirTri*=-1;else{colTri=col;dirTri=-1;}rendrTableau();}
+function fK(n){
+  if(!n&&n!==0)return'---';
+  var a=Math.abs(n),s=n<0?'-':'';
+  if(a>=1000000)return s+(a/1000000).toFixed(2)+'m';
+  if(a>=1000)return s+Math.round(a/1000)+'k';
+  return s+Math.round(a);
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function flash(msg){var d=document.createElement('div');d.className='flash-msg';d.textContent=msg;document.body.appendChild(d);setTimeout(function(){d.remove();},2500);}
+
+// Listeners modale
+document.getElementById('modal-close-btn').addEventListener('click',fermerModal);
+document.getElementById('modal-back-btn').addEventListener('click',retourRecherche);
+document.getElementById('api-search-btn').addEventListener('click',apiRechercher);
+document.getElementById('api-input').addEventListener('keydown',function(e){if(e.key==='Enter')apiRechercher();});
+document.getElementById('craft-qty').addEventListener('input',mettreAJourRecette);
+document.getElementById('btn-use-cost').addEventListener('click',utiliserCout);
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)fermerModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')fermerModal();});
+
+rendreDashboard();
+setInterval(sauvegarder,30000);
+</script>
+</body>
+</html>
